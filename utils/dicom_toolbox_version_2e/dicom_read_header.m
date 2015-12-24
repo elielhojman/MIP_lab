@@ -1,4 +1,4 @@
-function info=dicom_read_volume(filename)
+function info=dicom_read_header(filename)
 % function for reading header of Dicom volume file
 %
 % info = dicom_read_header(filename);
