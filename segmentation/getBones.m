@@ -25,7 +25,7 @@ numPixels = cellfun(@numel, CC.PixelIdxList);
 bonesSeg = zeros(size(volume));
 bonesSeg(CC.PixelIdxList{maxIdx}) = 1;
 bonesSeg = imerode(bonesSeg, strel('square', R));
-bonesSeg = fillHoles(bonesSeg);
+% bonesSeg = fillHoles(bonesSeg);
 
 end
 
@@ -43,10 +43,6 @@ for i = 1:size(X,2);
     display(['i_min = ', num2str(minTh), ...
         ', conncomp = ', num2str(CC.NumObjects)])
     components(end+1) = CC.NumObjects;
- 
-    if CC.NumObjects > min(components)*1.2
-      break;
-    end     
 end
 
 [num_comp, min_idx] = min(components);
@@ -57,7 +53,7 @@ end
 
 function im_new = fillHoles(mat_seg)
 % Fill holes in skeleton
-R = 7;
+R = 3;
 [a, b, c] = size(mat_seg);
 im_new = mat_seg;
 for i = 1:a
