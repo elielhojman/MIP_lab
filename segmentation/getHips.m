@@ -1,7 +1,9 @@
-function [ hipsSeg ] = getHips( bonesSeg )
+function [ hipsSeg ] = getHips( bonesSeg, volume )
 %GETHIPS Get the area of the binary pixels of the hips
 %   We search for the change in the convhull to find the spine.
 %   To find the start of the hips we search for the end of the spine
+%   If we add the volume this means that we recalculate the bones of the
+%   hips using the imin and imax defined below.
 
 topSlice = size(bonesSeg,3);
 convhullWidth = [];
@@ -44,7 +46,22 @@ end
 
 hipsArea = zeros(size(bonesSeg));
 hipsArea(:,yMinSpine:end ,hipsStart:hipsEnd) = 1;
-hipsSeg = bonesSeg & hipsArea;
+
+if ~exist('volume','var')    
+    hipsSeg = bonesSeg & hipsArea;
+else
+    imax = 1300;
+    imin = 250;
+    intType = class(volume);
+    eval(['hipsArea = ' intType '(hipsArea);'])
+    volume = hipsArea .* volume;
+    hipsSeg = (volume < imax) & (volume > imin);
+    CC = bwconncomp(hipsSeg, 26);
+    numPixels = cellfun(@numel, CC.PixelIdxList);
+    [~,maxIdx] = max(numPixels);
+    hipsSeg = zeros(size(volume));
+    hipsSeg(CC.PixelIdxList{maxIdx}) = 1;    
+end
 end
 
 

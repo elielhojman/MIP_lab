@@ -8,7 +8,7 @@ function [ bonesSeg ] = getBones( volume, minTh )
 
 global maxTh;
 maxTh = 1300;
-R = 3;
+R = 1;
 % Search i_min
 if ~exist('minTh','var')
     minTh = searchMinTh(volume); 
