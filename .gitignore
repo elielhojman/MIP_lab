@@ -3,3 +3,9 @@ sacro
 tests
 *.rar
 *.zip
+
+# emacs and vim files
+*~
+*#
+
+
