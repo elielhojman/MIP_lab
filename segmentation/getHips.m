@@ -51,7 +51,7 @@ if ~exist('volume','var')
     hipsSeg = bonesSeg & hipsArea;
 else
     imax = 1300;
-    imin = 250;
+    imin = 220;
     intType = class(volume);
     eval(['hipsArea = ' intType '(hipsArea);'])
     volume = hipsArea .* volume;
@@ -60,7 +60,8 @@ else
     numPixels = cellfun(@numel, CC.PixelIdxList);
     [~,maxIdx] = max(numPixels);
     hipsSeg = zeros(size(volume));
-    hipsSeg(CC.PixelIdxList{maxIdx}) = 1;    
+    hipsSeg(CC.PixelIdxList{maxIdx}) = 1; 
+    % hipsSeg = fillHoles(hipsSeg,1);
 end
 end
 
@@ -74,11 +75,4 @@ xh = x(idxs);
 width = max(xh) - min(xh);
 end
 
-function [ square ] = getConvhullSquare(X)
-% Finds the width of the convhull
-[x, y] = ind2sub(size(X), find(X));
-idxs = convhull(x,y, 'simplify', true);
-xh = x(idxs);
-yh = y(idxs);
-square = [min(xh) max(xh) min(yh) max(xh)];
-end
+
