@@ -1,4 +1,4 @@
-function [ hipsSeg ] = getHips( bonesSeg, volume )
+function [ hipsSeg ] = getHips( bonesSeg, fill, volume )
 %GETHIPS Get the area of the binary pixels of the hips
 %   We search for the change in the convhull to find the spine.
 %   To find the start of the hips we search for the end of the spine
@@ -11,10 +11,14 @@ for j = 10:10:topSlice;
     convhullWidth(end+1) = getWidth(bonesSeg(:,:,j));
     % Last value much smaller than max, we started the spine
     if convhullWidth(end) < max(convhullWidth)*0.3
-        hipsEnd = j - 10
-        spineStart = j
+        hipsEnd = j - 10;
+        spineStart = j;
         break;
     end
+end
+
+if ~exist('hipsEnd','var') && topSlice > 150
+    hipsEnd = topSlice;
 end
 
 if ~exist('hipsEnd','var')
@@ -39,19 +43,26 @@ for j = hipsEnd:-1:1;
     end
 end
 
+if ~exist('hipsStart','var') && topSlice < 130
+    hipsStart = 1;
+end
+    
 if ~exist('hipsStart','var')
     display('FATAL - End of spine could not be found');
     return;
 end
 
+display(hipsStart);
+display(hipsEnd);
+
 hipsArea = zeros(size(bonesSeg));
 hipsArea(:,yMinSpine:end ,hipsStart:hipsEnd) = 1;
 
 if ~exist('volume','var')    
-    hipsSeg = bonesSeg & hipsArea;
+    hipsSeg = bonesSeg & hipsArea;    
 else
     imax = 1300;
-    imin = 220;
+    imin = 210;
     intType = class(volume);
     eval(['hipsArea = ' intType '(hipsArea);'])
     volume = hipsArea .* volume;
@@ -61,7 +72,9 @@ else
     [~,maxIdx] = max(numPixels);
     hipsSeg = zeros(size(volume));
     hipsSeg(CC.PixelIdxList{maxIdx}) = 1; 
-    % hipsSeg = fillHoles(hipsSeg,1);
+    if fill
+        hipsSeg = fillHoles(hipsSeg,1);
+    end
 end
 end
 

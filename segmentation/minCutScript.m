@@ -1,16 +1,16 @@
 
 % We get the CT only of the hips segmented area
 xMiddle = 265;
-hipsArea = zeros(size(hipsSeg));
+hipsLeft = zeros(size(hipsSeg));
 
 % We first do the min cut of the left part
-hipsArea(1:xMiddle,:,:) = hipsSeg(1:xMiddle,:,:); 
-intType = class(mat.img);
-eval(['hipsArea = ' intType '(hipsArea);'])
-hipsCT = matpat.img .* hipsArea;
+hipsLeft(1:xMiddle,:,:) = hipsSeg(1:xMiddle,:,:); 
+intType = class(matpat.img);
+eval(['hipsLeft = ' intType '(hipsLeft);'])
+hipsCT = matpat.img .* hipsLeft;
 
 % Node map. We map the idx of the node in the image to 1,2,3 ...
-nodesIdx = find(hipsArea);
+nodesIdx = find(hipsLeft);
 maxIdx = max(nodesIdx);
 nodeMap = zeros(1, maxIdx);
 for i = 1:numel(nodesIdx)
@@ -18,7 +18,7 @@ for i = 1:numel(nodesIdx)
 end
 
 % Create the sparse matrix
-conn = 8;
+conn = 10;
 nodesNum = numel(nodesIdx);
 Sx = ones(1, nodesNum*conn/2,'double');
 Sy = ones(1, nodesNum*conn/2,'double');
@@ -32,6 +32,15 @@ for i = 1:numel(nodesIdx)
         if neighIdx > numel(nodeMap)  continue;  end;
         % The weight to put in the edge connection
         pixels = [hipsCT(neighIdx), hipsCT(myIdx)];        
+%         if myIdx + cols == neighIdx
+%             pixels = pixels ./100;
+%         end
+%         if myIdx + 1 == neighIdx
+%             pixels = pixels ./100;
+%         end
+        if myIdx + cols*rows == neighIdx
+            pixels = pixels * 4;
+        end
         if min(pixels) <= 0 continue; end;
         Sx(k) = nodeMap(myIdx);
         Sy(k) = nodeMap(neighIdx);
@@ -45,7 +54,7 @@ weights = min(pixelsV, [], 2).^2;
 S = sparse(Sx,Sy,weights,nodesNum,nodesNum);
 
 % Mark all of the nodes of the ilium
-p = getIliumPoints(hipsSeg, 10, 100, 'left');
+p = getIliumPoints(hipsSeg, 'left');
 iliumL = zeros(size(hipsSeg));
 iliumL(p) = 1;
 iliumL = imdilate(iliumL, strel('square', 10));
@@ -54,8 +63,11 @@ iliumL = iliumL & hipsSeg;
 % Mark the sacrum points
 sacrum = zeros(size(hipsSeg));
 sacrum (xMiddle, :, hipsStart:hipsEnd) = 1;
-sacrum = imdilate(sacrum, strel('square', 60));
-sacrum = hipsArea & sacrum;
+% TODO, move to cm instead of pixels
+sacrum = imdilate(sacrum, strel('square', 70));
+sacrum = hipsLeft & sacrum;
+
+[sacrum, iliumL] = extendSacrumIlium(hipsLeft, sacrum, iliumL, 'left');
 
 % Load the unary matrix
 U = zeros(2,nodesNum);

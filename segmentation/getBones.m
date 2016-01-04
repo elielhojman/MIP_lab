@@ -1,6 +1,10 @@
-function [ bonesSeg ] = getBones( volume, minTh, fill )
+function [ bonesSeg ] = getBones( volume, fill, minTh )
 % function to get the bone segmentation on a volume
-%
+% INPUT:
+%    volume - The matrix image
+%    fill - boolean value to perform filling of holes in each of the 3D
+%    planes
+%    minTh - imin Threshold
 % We do a threshold segmentation based on maxTh (locally fixed)
 % and minTh. minTh is an optional argument, in case not provided 
 % it is determined by searching for the minimum number of components
@@ -25,7 +29,7 @@ numPixels = cellfun(@numel, CC.PixelIdxList);
 bonesSeg = zeros(size(volume));
 bonesSeg(CC.PixelIdxList{maxIdx}) = 1;
 bonesSeg = imerode(bonesSeg, strel('square', R));
-if exist('fill','var')
+if ~exist('fill','var') && fill == 1
  bonesSeg = fillHoles(bonesSeg);
 end
 
