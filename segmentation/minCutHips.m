@@ -1,24 +1,25 @@
-function [ output_args ] = minCutHips( mat, hipsSeg, side, conn )
+function [ seg ] = minCutHips( mat, hipsSeg, side, conn )
 %MINCUTHIPS Summary of this function goes here
 %   Detailed explanation goes here
 
+display('MinCutHips started');
 if strcmp(side,'right') && strcmp(side,'left')
     error('FATAL - side must be "right" or "left"')
 end
 
 xMiddle = getXMiddle(hipsSeg);
-hipsArea = zeros(size(hipsSeg));
+hipsSide = zeros(size(hipsSeg));
 
 if strcmp(side,'left')
-    hipsArea(1:xMiddle,:,:) = hipsSeg(1:xMiddle,:,:); 
+    hipsSide(1:xMiddle,:,:) = hipsSeg(1:xMiddle,:,:); 
 else
-    hipsArea(xMiddle:end,:,:) = hipsSeg(xMiddle:end,:,:); 
+    hipsSide(xMiddle:end,:,:) = hipsSeg(xMiddle:end,:,:); 
 end
 intType = class(mat.img);
-eval(['hipsArea = ' intType '(hipsArea);'])
-hipsCT = mat.img .* hipsArea;
+eval(['hipsSide = ' intType '(hipsSide);'])
+hipsCT = mat.img .* hipsSide;
 
-nodesIdx = find(hipsArea);
+nodesIdx = find(hipsSide);
 maxIdx = max(nodesIdx);
 nodeMap = zeros(1, maxIdx);
 for i = 1:numel(nodesIdx)
@@ -52,19 +53,21 @@ weights = min(pixelsV, [], 2).^2;
 S = sparse(Sx,Sy,weights,nodesNum,nodesNum);
 
 % Mark all of the nodes of the ilium
-p = getIliumPoints(hipsSeg, 'left');
-iliumL = zeros(size(hipsSeg));
+p = getIliumPoints(hipsSide, 'left');
+iliumL = zeros(size(hipsSide));
 iliumL(p) = 1;
 iliumL = imdilate(iliumL, strel('square', 10));
-iliumL = iliumL & hipsSeg;
+iliumL = iliumL & hipsSide;
 
 % Mark the sacrum points
-sacrum = zeros(size(hipsSeg));
+[hipsStart, hipsEnd] = getStartEnd(hipsSide);
+sacrum = zeros(size(hipsSide));
 sacrum (xMiddle, :, hipsStart:hipsEnd) = 1;
+% TODO, parametize this pixel value
 sacrum = imdilate(sacrum, strel('square', 60));
-sacrum = hipsArea & sacrum;
+sacrum = hipsSide & sacrum;
 
-[sacrum, iliumL] = extendSacrumIlium(hipsSeg, sacrum, iliumL);
+[sacrum, iliumL] = extendSacrumIlium(hipsSide, sacrum, iliumL, 'left');
 
 % Load the unary matrix
 U = zeros(2,nodesNum);
@@ -77,15 +80,11 @@ BK_SetUnary(bk, U);
 BK_Minimize(bk)
 labeling = BK_GetLabeling(bk);
 
-seg = zeros(size(hipsSeg)); 
+seg = zeros(size(hipsSide)); 
 seg(nodesIdx(labeling == 2)) = 2;
 seg(nodesIdx(labeling == 1)) = 1;
 seg(iliumL) = 3;
 seg(sacrum) = 4;
-
-matSeg = mat;
-matSeg.img = seg; 
-save_untouch_nifti_gzip(matSeg, 'sacro/normal/minCut093.nii', 2)
 
 BK_Delete(BK_ListHandles())
 
