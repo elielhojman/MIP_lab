@@ -1,4 +1,4 @@
-function dicom_write_volume(Volume,filename,volscale,info)
+function dicom_write_volume(Volume,filename,info,volscale)
 % This function DICOM_WRITE_VOLUME will write a Matlab 3D volume as
 % a stack of 2D slices in separate dicom files.
 %
@@ -54,15 +54,15 @@ for slicenum=1:size(Volume,3)
     filenamedicom=[filename number2string(slicenum) '.dcm'];
     % Add slice specific dicom info
     info.InstanceNumber = slicenum;
-    info.SliceLocation = info.SliceLocation+volscale(3);
+    info.SliceLocation = info.SliceLocation;
     % Write the dicom file
     disp(['Writing : ' filenamedicom]);
-    dicomwrite(Volume(:,:,slicenum), filenamedicom, info) ;
-	if(slicenum==1),
-		info2=dicominfo(filenamedicom);
-        info.StudyInstanceUID=info2.StudyInstanceUID;
-        info.SeriesInstanceUID=info2.SeriesInstanceUID;
-	end
+    dicomwrite(Volume(:,:,slicenum), filenamedicom, info, 'CreateMode', 'Copy') ;
+% 	if(slicenum==1),
+% 		info2=dicominfo(filenamedicom);
+%         info.StudyInstanceUID=info2.StudyInstanceUID;
+%         info.SeriesInstanceUID=info2.SeriesInstanceUID;
+% 	end
 end
 
 

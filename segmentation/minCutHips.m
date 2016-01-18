@@ -1,4 +1,4 @@
-function [ seg ] = minCutHips( mat, hipsSeg, side, conn )
+function [ seg ] = minCutHips( vol, hipsSeg, side, conn )
 %MINCUTHIPS Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -15,9 +15,9 @@ if strcmp(side,'left')
 else
     hipsSide(xMiddle:end,:,:) = hipsSeg(xMiddle:end,:,:); 
 end
-intType = class(mat.img);
-eval(['hipsSide = ' intType '(hipsSide);'])
-hipsCT = mat.img .* hipsSide;
+%intType = class(vol);
+%eval(['hipsSide = ' intType '(hipsSide);'])
+hipsCT = vol .* hipsSide;
 
 nodesIdx = find(hipsSide);
 maxIdx = max(nodesIdx);
@@ -37,10 +37,10 @@ for i = 1:numel(nodesIdx)
     neigh = getNeighbours(hipsCT, myIdx, conn, 1);
     for j = 1:numel(neigh)
         neighIdx = neigh(j);
-        if neighIdx > numel(nodeMap)  continue;  end;
+        if neighIdx > numel(nodeMap);  continue;  end;
         % The weight to put in the edge connection
-        pixels = [hipsCT(neighIdx), hipsCT(myIdx)];        
-        if min(pixels) <= 0 continue; end;
+        pixels = [hipsCT(neighIdx), hipsCT(myIdx)];          
+        if min(pixels) <= 0; continue; end;
         Sx(k) = nodeMap(myIdx);
         Sy(k) = nodeMap(neighIdx);
         pixelsV(k,:) = pixels;        

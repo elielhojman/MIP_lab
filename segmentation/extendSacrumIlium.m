@@ -15,6 +15,9 @@ for i = extendStart:hipsEnd
     sacP = find(sacrum(:,:,i));
     iliP = find(ilium(:,:,i));
     CC = bwconncomp(hipsSeg(:,:,i));
+    if CC.NumObjects > 4 % We want to be sure the sacrum don't get parts of the ilium
+        continue;
+    end
     isSacMemb = @(P) max(ismember(P,sacP));
     isIliMemb = @(P) max(ismember(P,iliP));
     sacMembers = cellfun(isSacMemb,CC.PixelIdxList);
@@ -55,7 +58,7 @@ end
 % Here we go up and down in the Z axis and take all
 % assign the pixels which start near the line to one of the bones
 % TODO explain this better
-SHIFT = 5;
+SHIFT = 4;
 for t = 1:5
     if strcmp(side,'left')
         for i = hipsStart:hipsEnd

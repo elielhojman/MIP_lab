@@ -14,7 +14,7 @@ end
 idxs = convhull(x,y, 'simplify', true);
 xh = x(idxs);
 yh = y(idxs);
-square = [min(xh) max(xh) min(yh) max(xh)];
+square = [min(xh) max(xh) min(yh) max(yh)];
 end
 
 
