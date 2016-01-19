@@ -41,16 +41,22 @@ for i = hipsStart:hipsEnd
     filled = fillAxialHoles(hipsSeg(:,:,i));
     fill = filled - hipsSeg(:,:,i);
     CC = bwconncomp(fill,8);
-    sacP = find(sacrum(:,:,i));        
+    sacP = find(sacrum(:,:,i));     
+    iliP = find(ilium(:,:,i));
     for j = 1:size(CC.PixelIdxList,2)        
         fill = fill & 0;                
         fill(CC.PixelIdxList{j}) = 1;
         border = imdilate(fill, strel('square',5)) - fill; 
         border = find(border);
         isSacMemb = max(ismember(border,sacP));
+        isIliMemb = max(ismember(border,iliP));
         if isSacMemb                  
             p3d = rows*cols*(i-1) + border;
             sacrum(p3d) = 1;
+        end
+        if isIliMemb
+            p3d = rows*cols*(i-1) + border;
+            ilium(p3d) = 1;
         end
     end
 end
@@ -78,6 +84,7 @@ end
 
 
 sacrum = sacrum & hipsSeg;
+ilium = ilium & hipsSeg;
             
 end
 

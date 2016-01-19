@@ -17,8 +17,9 @@ for j = 10:10:topSlice;
     end
 end
 
-if ~exist('hipsEnd','var') && topSlice > 150
-    hipsEnd = topSlice;
+if ~exist('hipsEnd','var')
+    hipsEnd = topSlice-10;
+    spineStart = topSlice;
 end
 
 if ~exist('hipsEnd','var')
@@ -28,23 +29,28 @@ end
 
 % Search for end of spine
 square = getConvhullSquare(bonesSeg(:,:,spineStart));
+if square(1) == 0 || square(2) == 0
+    square = [1 size(bonesSeg,1) 1 size(bonesSeg,2)];
+end
 lowerSpine = zeros(size(bonesSeg));
 % As we care about the sacro-ilium join we can look until the end of the
 % spine the y axis as well
 lowerSpine(square(1):square(2), :, 1:spineStart) = 1;
 yMinSpine = square(3);
 
+spinePixels = [];
 for j = hipsEnd:-1:1;
     spineImg = lowerSpine(:,:,j) & bonesSeg(:,:,j);
-    spinePixels = numel(find(spineImg));
-    if spinePixels < 60
+    spinePixels(end+1) = numel(find(spineImg));
+    if spinePixels(end) < 60
         hipsStart = j;
         break;
     end
 end
 
-if ~exist('hipsStart','var') && topSlice < 130
-    hipsStart = 1;
+if ~exist('hipsStart','var')
+    [~,j] = min(spinePixels);
+    hipsStart = hipsEnd - j + 1;
 end
     
 if ~exist('hipsStart','var')
@@ -82,6 +88,10 @@ end
 function [ width ] = getWidth(X)
 % Finds the width of the convhull
 [x, y] = ind2sub(size(X), find(X));
+if numel(x) == 0
+    width = 0;
+    return
+end
 idxs = convhull(x,y, 'simplify', true);
 xh = x(idxs);
 % yh = y(idxs);
