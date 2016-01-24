@@ -44,8 +44,13 @@ if conn >= 26
     n = [n downIdx-y-1 downIdx-y+1 downIdx+y-1 downIdx+y+1];
 end
 
+n = reshape(n',numel(n),1);
+idx = repmat(idx,1,conn)';
+idx = reshape(idx, numel(idx),1);
+n = [n idx];
+
 if onlyBigger == 1
-    n = n(n > idx);
+    n = n(n(:,1) > n(:,2),:);
 end
 
     

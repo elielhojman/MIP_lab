@@ -15,7 +15,7 @@ for i = extendStart:hipsEnd
     sacP = find(sacrum(:,:,i));
     iliP = find(ilium(:,:,i));
     CC = bwconncomp(hipsSeg(:,:,i));
-    if CC.NumObjects > 4 % We want to be sure the sacrum don't get parts of the ilium
+    if CC.NumObjects > 5 % We want to be sure the sacrum don't get parts of the ilium
         continue;
     end
     isSacMemb = @(P) max(ismember(P,sacP));

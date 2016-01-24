@@ -32,7 +32,7 @@ square = getConvhullSquare(bonesSeg(:,:,spineStart));
 if square(1) == 0 || square(2) == 0
     square = [1 size(bonesSeg,1) 1 size(bonesSeg,2)];
 end
-lowerSpine = zeros(size(bonesSeg));
+lowerSpine = zeros(size(bonesSeg),'int8');
 % As we care about the sacro-ilium join we can look until the end of the
 % spine the y axis as well
 lowerSpine(square(1):square(2), :, 1:spineStart) = 1;
@@ -42,7 +42,7 @@ spinePixels = [];
 for j = hipsEnd:-1:1;
     spineImg = lowerSpine(:,:,j) & bonesSeg(:,:,j);
     spinePixels(end+1) = numel(find(spineImg));
-    if spinePixels(end) < 60
+    if spinePixels(end) < 30
         hipsStart = j;
         break;
     end
@@ -61,22 +61,20 @@ end
 display(hipsStart);
 display(hipsEnd);
 
-hipsArea = zeros(size(bonesSeg));
+hipsArea = zeros(size(bonesSeg),'int8');
 hipsArea(:,yMinSpine:end ,hipsStart:hipsEnd) = 1;
 
 if ~exist('volume','var')    
     hipsSeg = bonesSeg & hipsArea;    
 else
     imax = 1300;
-    imin = 210;
-    intType = class(volume);
-    eval(['hipsArea = ' intType '(hipsArea);'])
-    volume = hipsArea .* volume;
+    imin = 210;    
+    volume = single(hipsArea) .* volume;
     hipsSeg = (volume < imax) & (volume > imin);
     CC = bwconncomp(hipsSeg, 26);
     numPixels = cellfun(@numel, CC.PixelIdxList);
     [~,maxIdx] = max(numPixels);
-    hipsSeg = zeros(size(volume));
+    hipsSeg = zeros(size(volume),'int8');
     hipsSeg(CC.PixelIdxList{maxIdx}) = 1; 
     if fill
         hipsSeg = fillHoles(hipsSeg,1);

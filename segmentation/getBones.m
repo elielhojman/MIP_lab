@@ -26,7 +26,7 @@ bonesSeg = imdilate(bonesSeg, strel('square', R));
 CC = bwconncomp(bonesSeg, 26);
 numPixels = cellfun(@numel, CC.PixelIdxList);
 [~,maxIdx] = max(numPixels);
-bonesSeg = zeros(size(volume));
+bonesSeg = zeros(size(volume),'int8');
 bonesSeg(CC.PixelIdxList{maxIdx}) = 1;
 bonesSeg = imerode(bonesSeg, strel('square', R));
 if ~exist('fill','var') && fill == 1
