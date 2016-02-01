@@ -20,8 +20,12 @@ end
 
 bonesSeg = volume < maxTh & volume > minTh;
  %% Getting the greatest connected component
-
-bonesSeg = bwareaopen(bonesSeg, 4000, 26);
+hipZoom = isHipsZoom(bonesSeg);
+if hipZoom
+    R = 7;
+else
+    bonesSeg = bwareaopen(bonesSeg, 4000, 26);
+end
 bonesSeg = imdilate(bonesSeg, strel('square', R));
 CC = bwconncomp(bonesSeg, 26);
 numPixels = cellfun(@numel, CC.PixelIdxList);
@@ -55,6 +59,5 @@ end
 minTh = X(min_idx);
 display(['i_min = ', num2str(minTh),'. #Components ', num2str(num_comp)]);
 end
-
 
 

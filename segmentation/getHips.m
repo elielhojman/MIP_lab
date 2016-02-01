@@ -6,11 +6,16 @@ function [ hipsSeg ] = getHips( bonesSeg, fill, volume )
 %   hips using the imin and imax defined below.
 
 topSlice = size(bonesSeg,3);
+zoom = isHipsZoom(bonesSeg);
 convhullWidth = [];
+Rconv = 0.3;
+if zoom
+    Rconv = 0.6;
+end
 for j = 10:10:topSlice;    
     convhullWidth(end+1) = getWidth(bonesSeg(:,:,j));
     % Last value much smaller than max, we started the spine
-    if convhullWidth(end) < max(convhullWidth)*0.3
+    if convhullWidth(end) < max(convhullWidth)*Rconv;
         hipsEnd = j - 10;
         spineStart = j;
         break;
@@ -58,6 +63,10 @@ if ~exist('hipsStart','var')
     return;
 end
 
+if zoom
+    hipsStart = 1;
+end
+
 display(hipsStart);
 display(hipsEnd);
 
@@ -68,9 +77,18 @@ if ~exist('volume','var')
     hipsSeg = bonesSeg & hipsArea;    
 else
     imax = 1300;
-    imin = 210;    
+    imin = 200;    
     volume = single(hipsArea) .* volume;
     hipsSeg = (volume < imax) & (volume > imin);
+    
+    % Add canny edge
+    display('Calculating canny edge');
+    edgesHips = canny(volume(:,:,hipsStart:hipsEnd),[1 1 0], 'TMethod','relMax', 'TValue',[0.03, 0.9]);
+    edges = zeros(size(hipsSeg),'int8');
+    edges(:,:,hipsStart:hipsEnd) = int8(edgesHips); clear edgesHips;
+    edges = edges & (volume > 50) & volume <= imin;        
+    hipsSeg = hipsSeg | edges; clearvars edges;
+    
     CC = bwconncomp(hipsSeg, 26);
     numPixels = cellfun(@numel, CC.PixelIdxList);
     [~,maxIdx] = max(numPixels);
