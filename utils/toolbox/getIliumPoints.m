@@ -8,7 +8,7 @@ square = getConvhullSquare(hipsSeg(:,:,centerZ));
 
 [rows,cols,~] = size(hipsSeg);
 points = [];
-if strcmp(side, 'left')
+if strcmp(side, 'right')
     centerX = (square(1) + square(2)) / 2;
     leftSide = square(1) + abs(square(1) - centerX) / 3;
     for i = hipsStart:hipsEnd

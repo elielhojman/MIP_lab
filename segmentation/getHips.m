@@ -78,6 +78,7 @@ if ~exist('volume','var')
 else
     imax = 1300;
     imin = 200;    
+    cannyThresh = 110;
     volume = single(hipsArea) .* volume;
     hipsSeg = (volume < imax) & (volume > imin);
     
@@ -86,7 +87,7 @@ else
     edgesHips = canny(volume(:,:,hipsStart:hipsEnd),[1 1 0], 'TMethod','relMax', 'TValue',[0.03, 0.9]);
     edges = zeros(size(hipsSeg),'int8');
     edges(:,:,hipsStart:hipsEnd) = int8(edgesHips); clear edgesHips;
-    edges = edges & (volume > 50) & volume <= imin;        
+    edges = edges & (volume > cannyThresh) & volume <= imin;        
     hipsSeg = hipsSeg | edges; clearvars edges;
     
     CC = bwconncomp(hipsSeg, 26);

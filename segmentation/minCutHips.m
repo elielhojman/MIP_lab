@@ -13,7 +13,7 @@ end
 xMiddle = getXMiddle(hipsSeg);
 hipsSide = zeros(size(hipsSeg),'int8');
 
-if strcmp(side,'left')    
+if strcmp(side,'right')    
     hipsSide(1:xMiddle,:,:) = hipsSeg(1:xMiddle,:,:); 
 else
     hipsSide(xMiddle:end,:,:) = hipsSeg(xMiddle:end,:,:); 
@@ -60,17 +60,17 @@ S = sparse(Sx,Sy,weights,nodesNum,nodesNum);
 
 % Mark all of the nodes of the ilium
 display('Initialize ilium');
-p = getIliumPoints(hipsSide, 'left');
-iliumL = zeros(size(hipsSide),'int8');
-iliumL(p) = 1;
+p = getIliumPoints(hipsSide, side);
+ilium = zeros(size(hipsSide),'int8');
+ilium(p) = 1;
 if ~hipsZoom
     Rilium = round(25/pixelSize);
 else
     Rilium = round(10/pixelSize);
 end
 
-iliumL = imdilate(iliumL, strel('square', Rilium));
-iliumL = iliumL & hipsSide;
+ilium = imdilate(ilium, strel('square', Rilium));
+ilium = ilium & hipsSide;
 
 % Mark the sacrum points
 display('Initialize sacrum');
@@ -86,10 +86,10 @@ sacrum = hipsSide & sacrum;
 sacrum = imdilate(sacrum, strel('square', round(CM_4/3)));
 sacrum = hipsSide & sacrum;
 
-[sacrum, iliumL] = extendSacrumIlium(hipsSide, sacrum, iliumL, 'left');
+[sacrum, ilium] = extendSacrumIlium(hipsSide, sacrum, ilium, side);
 % Load the unary matrix
 U = zeros(2,nodesNum);
-U(1,nodeMap(iliumL)) = 10e6;
+U(1,nodeMap(ilium)) = 10e6;
 U(2,nodeMap(sacrum)) = 10e6;
 
 bk = BK_Create(nodesNum, nodesNum*conn/2);
@@ -102,7 +102,7 @@ labeling = BK_GetLabeling(bk);
 seg = zeros(size(hipsSide),'int8'); 
 seg(nodesIdx(labeling == 2)) = 2;
 seg(nodesIdx(labeling == 1)) = 1;
-seg(iliumL) = 3;
+seg(ilium) = 3;
 seg(sacrum) = 4;
 
 BK_Delete(BK_ListHandles())

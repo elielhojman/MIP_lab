@@ -53,9 +53,12 @@ filterToL(end,SHIFT+1,3) = 1;
 filterToL(SHIFT+1,SHIFT+1,2) = 1;
 
 for t = 1:4
-    if strcmp(side,'left')        
+    if strcmp(side,'right')        
         sacrum = imfilter(sacrum,filterToR,'same');                                   
         ilium = imfilter(ilium, filterToL,'same');
+    else
+        sacrum = imfilter(sacrum,filterToL,'same');                                   
+        ilium = imfilter(ilium, filterToR,'same');
     end
 end
 

@@ -9,7 +9,7 @@ if ~isfield(dicom_info.DicomInfo,'RescaleIntercept') || ...
     error('Slope/Intercept rescale was not found in the dicom info');
 end
 
-vol = zeros(size(dicom_vol),'int16');
+vol = zeros(size(dicom_vol),'single');
 % This is related to the orientation, which may change between images
 for i = 1:size(dicom_vol,3)
     vol(:,:,i) = dicom_vol(:,:,end-i+1)';
