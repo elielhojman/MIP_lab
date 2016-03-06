@@ -1,4 +1,4 @@
-function [ segL, score, noise ] = segmentSij( fPath, outfile  )
+function [ seg, score, noise ] = segmentSij( fPath, outfile  )
 %SEGMENTSIJ Run segmentation on the SacroIlium Joint
 % We need to point the folder containing the DICOM files.
 % Optional
@@ -15,8 +15,8 @@ slices = size(vol,3); display(slices);
 vol = dicom2niftiVol(vol, dicomInfo);
 bonesSeg = getBones(vol, 0);
 hipsSeg = getHips(bonesSeg, 0, vol); clearvars bonesSeg;
-segR = minCutHips(vol, dicomInfo, hipsSeg, 'right', 10);
-segL = minCutHips(vol, dicomInfo, hipsSeg, 'left', 10);
+[segR, cutR] = minCutHips(vol, dicomInfo, hipsSeg, 'right', 10);
+[segL, cutL] = minCutHips(vol, dicomInfo, hipsSeg, 'left', 10);
 if exist('outfile','var')
     close all;
     picsSeries(segR, vol, [basefolder, '/', folder, '_R4.jpg']);
@@ -24,7 +24,9 @@ if exist('outfile','var')
 end
 scoreL = scoreSegmentation(segL,vol,dicomInfo,'left');
 scoreR = scoreSegmentation(segR,vol,dicomInfo,'right');
-score = [scoreL;scoreR];
+score = [scoreL cutL;scoreR cutR];
 noise = getNoiseValue(vol);
+seg.L = segL;
+seg.R = segR;
 end
 

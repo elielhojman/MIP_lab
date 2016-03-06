@@ -8,8 +8,11 @@ for i = 1:numel(data)
 %             continue;
 %         end
         filename = [basefolder, data{i}.accessNum];               
-        tic; [seg, sc, noise] = segmentSij(filename, 1); toc;
+        tic; [seg, score, noise] = segmentSij(filename); toc;
         data{i}.noise = noise;        
-        data{i}.score = sc;
+        data{i}.score = score;
+        info = data{i};
+        segFile = [fPath '/segmentation'];
+        save(segFile, 'seg', 'info');
     end
 end

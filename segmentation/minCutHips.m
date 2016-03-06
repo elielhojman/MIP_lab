@@ -1,6 +1,10 @@
-function [ seg ] = minCutHips( vol, info, hipsSeg, side, conn )
+function [ seg, cutScore ] = minCutHips( vol, info, hipsSeg, side, conn )
 %MINCUTHIPS Summary of this function goes here
 %   Detailed explanation goes here
+
+% We only take the elements which are at least THRESH_SIZE percent bigger than
+% the biggest element
+THRESH_SIZE = 0.02; % Two percent
 
 pixelSize = info.DicomInfo.PixelSpacing(1);
 hipsZoom = isHipsZoom(hipsSeg);
@@ -96,12 +100,14 @@ bk = BK_Create(nodesNum, nodesNum*conn/2);
 BK_SetNeighbors(bk, S);
 BK_SetUnary(bk, U);
 display('Finding min-cut');
-BK_Minimize(bk)
+cutScore = BK_Minimize(bk)
 labeling = BK_GetLabeling(bk);
 
 seg = zeros(size(hipsSide),'int8'); 
-seg(nodesIdx(labeling == 2)) = 2;
-seg(nodesIdx(labeling == 1)) = 1;
+labels1 = removeIsolated(labeling, 1, THRESH_SIZE, hipsSide, nodesIdx);
+labels2 = removeIsolated(labeling, 2, THRESH_SIZE, hipsSide, nodesIdx);
+seg(labels2) = 2;
+seg(labels1) = 1;
 seg(ilium) = 3;
 seg(sacrum) = 4;
 
@@ -109,3 +115,13 @@ BK_Delete(BK_ListHandles())
 
 end
 
+function finalLabels = removeIsolated(labeling, labelIdx, THRESH_SIZE, hipsSide, nodesIdx)
+% We filter the isolated points
+seg = zeros(size(hipsSide),'int8'); 
+seg(nodesIdx(labeling == labelIdx)) = labelIdx;
+CC = bwconncomp(seg,26);
+sizeComps = cellfun(@numel,CC.PixelIdxList);
+maxCompSz = max(sizeComps);
+seg = bwareaopen(seg, round(THRESH_SIZE*maxCompSz), 26);
+finalLabels = find(seg);
+end
