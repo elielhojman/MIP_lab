@@ -19,8 +19,12 @@ hipsSeg = getHips(bonesSeg, 0, vol); clearvars bonesSeg;
 [segL, cutL] = minCutHips(vol, dicomInfo, hipsSeg, 'left', 10);
 if exist('outfile','var')
     close all;
-    picsSeries(segR, vol, [basefolder, '/', folder, '_R4.jpg']);
-    picsSeries(segL, vol, [basefolder, '/', folder, '_L4.jpg']);
+    try
+        picsSeries(segR, vol, [basefolder, '/', folder, '_', outfile, 'R.jpg']);
+        picsSeries(segL, vol, [basefolder, '/', folder, '_', outfile, 'L.jpg']);
+    catch
+        display('Problem showing the images');
+    end
 end
 scoreL = scoreSegmentation(segL,vol,dicomInfo,'left');
 scoreR = scoreSegmentation(segR,vol,dicomInfo,'right');

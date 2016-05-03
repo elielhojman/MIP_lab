@@ -15,13 +15,13 @@ for i = 1:length(data)
 end
 
 N = length(traindata);
-scores = zeros(N,16);
+scores = zeros(N,9);
 group = zeros(N,1);
 for i = 1:N
     scores(i,:) = traindata{i}.score;
     group(i) = traindata{i}.group;
 end
-scoresC = scores(:,[10:16]);
+scoresC = scores(:,:);
 K = 10;
 indices = crossvalind('Kfold',group,K);
 cp = classperf(group);

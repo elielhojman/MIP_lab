@@ -83,12 +83,12 @@ else
     hipsSeg = (volume < imax) & (volume > imin);
     
     % Add canny edge
-    display('Calculating canny edge');
-    edgesHips = canny(volume(:,:,hipsStart:hipsEnd),[1 1 0], 'TMethod','relMax', 'TValue',[0.03, 0.9]);
-    edges = zeros(size(hipsSeg),'int8');
-    edges(:,:,hipsStart:hipsEnd) = int8(edgesHips); clear edgesHips;
-    edges = edges & (volume > cannyThresh) & volume <= imin;        
-    hipsSeg = hipsSeg | edges; clearvars edges;
+%     display('Calculating canny edge');
+%     edgesHips = canny(volume(:,:,hipsStart:hipsEnd),[1 1 0], 'TMethod','relMax', 'TValue',[0.03, 0.9]);
+%     edges = zeros(size(hipsSeg),'int8');
+%     edges(:,:,hipsStart:hipsEnd) = int8(edgesHips); clear edgesHips;
+%     edges = edges & (volume > cannyThresh) & volume <= imin;        
+%     hipsSeg = hipsSeg | edges; clearvars edges;
     
     CC = bwconncomp(hipsSeg, 26);
     numPixels = cellfun(@numel, CC.PixelIdxList);
