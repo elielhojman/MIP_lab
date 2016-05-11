@@ -167,7 +167,7 @@ function btnSavePoints_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 [x,y] = getpts();
 for k = 1:numel(x)
-    s = struct('x',round(x),'y',round(y),'z',handles.sliceNum, ...
+    s = struct('x',round(x(k)),'y',round(y(k)),'z',handles.sliceNum, ...
         'accNum',handles.accNum,'side',handles.side,'diagnosis',handles.diagnosis);
     handles.pointsOfInterest{end+1} = s;
 end
