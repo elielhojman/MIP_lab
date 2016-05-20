@@ -16,7 +16,7 @@ end
 
 %% Create the leftBad and rightBad
 removeLastChar = @(m)m(1:end-1);
-allBad = [badSeg veryBadSeg];
+allBad = veryBadSeg;
 r = @(m)m;
 if iscell(allBad{1})
     allBad = cellfun(r,allBad);

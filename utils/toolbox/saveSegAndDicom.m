@@ -20,9 +20,8 @@ end
 for i=1:size(seg,3)
     seg(:,:,i) = fliplr(seg(:,:,i));
 end
-pause(8);
-display('Press a key');
-pause
+pause(20);
+pause(10);
 mat = load_untouch_nii_gzip([outfile,'/',file]);
 outfileSeg = [outfile,'/',segName];
 matSeg = mat; matSeg.img = seg; save_untouch_nifti_gzip(matSeg, outfileSeg , 2);

@@ -22,7 +22,7 @@ function varargout = imageScroller(varargin)
 
 % Edit the above text to modify the response to help imageScroller
 
-% Last Modified by GUIDE v2.5 11-May-2016 17:50:08
+% Last Modified by GUIDE v2.5 17-May-2016 14:32:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -102,7 +102,7 @@ M = max([diffX, diffY]);
 square = [square(1), square(1)+M, square(3), square(3)+M];
 colormap gray(256);    
 axis(square);
-set(gca, 'CLim', [0, 700]);    
+set(gca, 'CLim', [0, 1000]);    
 guidata(hObject,handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -154,15 +154,21 @@ handles.seg = seg;
 M = size(vol,3)-1;
 set(handles.slider1,'Max',M);
 set(handles.slider1,'Min',0);
+for i = 1:size(vol,3)
+    if numel(find(seg(:,:,i))) > 0
+        set(handles.slider1,'Value',i);
+    end
+end
+
 set(handles.slider1,'SliderStep',[1/M 1/M]);
 guidata(hObject,handles);
 imagesc(handles.vol(:,:,1)','Parent',handles.axes1);
 set(handles.txtSliceNum,'String','Slice: 1');
 
 
-% --- Executes on button press in btnSavePoints.
-function btnSavePoints_Callback(hObject, eventdata, handles)
-% hObject    handle to btnSavePoints (see GCBO)
+% --- Executes on button press in btnSelectPoints.
+function btnSelectPoints_Callback(hObject, eventdata, handles)
+% hObject    handle to btnSelectPoints (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 [x,y] = getpts();
@@ -172,4 +178,50 @@ for k = 1:numel(x)
     handles.pointsOfInterest{end+1} = s;
 end
 guidata(hObject,handles);
+points = handles.pointsOfInterest;
+save('pointsOfInterest', 'points');
 
+
+% --- Executes on button press in radiobutton1.
+function radiobutton1_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton1
+
+
+% --- Executes on button press in radiobutton2.
+function radiobutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton2
+
+
+% --- Executes on button press in radiobutton3.
+function radiobutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton3
+
+
+% --- Executes on button press in radiobutton4.
+function radiobutton4_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton4
+
+
+% --- Executes on button press in radiobutton5.
+function radiobutton5_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton5
