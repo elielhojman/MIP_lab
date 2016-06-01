@@ -7,7 +7,7 @@ for i = 1:numel(dataWithCanny)
 
         if exist(segFile,'file') > 0
             display('Already segmented');
-            continue;
+        %    continue;
         end
         filename = [basefolder, dataWithCanny{i}.accessNum];               
         tic; [seg, score, noise] = segmentSij(filename,'withCanny'); toc;
@@ -15,6 +15,6 @@ for i = 1:numel(dataWithCanny)
         dataWithCanny{i}.score = score;
         info = dataWithCanny{i};
         segFile = [fPath '/segmentationWithCanny'];
-        save(segFile, 'seg', 'info');
+        % save(segFile, 'seg', 'info');
     end
 end

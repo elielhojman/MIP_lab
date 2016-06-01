@@ -1,5 +1,5 @@
-folderPath = 'images/allImgs/'
-fileslist = dir([folderPath '*.jpg']);
+folderPath = 'images/allImgs/';
+fileslist = dir([folderPath '*.gif']);
 group = zeros(size(fileslist,1),1);
 traindata = zeros(size(fileslist,1), 36*36); % 4000 as according to the exercise description
 normalize = 0;

@@ -90,7 +90,9 @@ sacrum = hipsSide & sacrum;
 sacrum = imdilate(sacrum, strel('square', round(CM_4/3)));
 sacrum = hipsSide & sacrum;
 
-[sacrum, ilium] = extendSacrumIlium(hipsSide, sacrum, ilium, side);
+[sacrum, ilium] = extendSacrumIlium(hipsSeg, sacrum, ilium, side);
+sacrum = sacrum & hipsSide;
+ilium = ilium & hipsSide;
 % Load the unary matrix
 U = zeros(2,nodesNum);
 U(1,nodeMap(ilium)) = 10e6;

@@ -1,6 +1,6 @@
 % VSM on HOG representation
 folderPath = 'images/allImgs/'
-fileslist = dir([folderPath '*.jpg']);
+fileslist = dir([folderPath '*.gif']);
 group = zeros(size(fileslist,1),1);
 traindata = zeros(size(fileslist,1), 9*9*6); % 3*9*9 
 normalize = 0;

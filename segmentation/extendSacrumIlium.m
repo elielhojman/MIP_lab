@@ -25,7 +25,7 @@ for i = [hipsStart:hipsStart+6 extendStart:hipsEnd];
     iliMembers = cellfun(isIliMemb,CC.PixelIdxList);
     sacOnlyMembers = sacMembers & ~iliMembers;    
     iliOnlyMembers = iliMembers & ~sacMembers;
-    for j = (sacOnlyMembers)
+    for j = find(sacOnlyMembers)
         if j == 0; continue; end;
         sac3dP = rows*cols*(i-1) + CC.PixelIdxList{j};
         sacrum(sac3dP) = 1;
