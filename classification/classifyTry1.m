@@ -1,34 +1,50 @@
-folderPath = 'images/allImgs/';
-fileslist = dir([folderPath '*.gif']);
-group = zeros(size(fileslist,1),1);
-traindata = zeros(size(fileslist,1), 36*36); % 4000 as according to the exercise description
+folderPathP = 'images/imgs_uint_P_resize/';
+folderPathN = 'images/imgs_uint_N_resize/';
+% folderPathP = 'images/imgs_uint_P/';
+% folderPathN = 'images/imgs_uint_N/';  
+%folderPathP = 'images/imgsP/';
+%folderPathN = 'images/imgsN/';
+
+fileslistP = dir([folderPathP '*.png']);
+fileslistN = dir([folderPathN '*.png']);
+fileslists = {fileslistP; fileslistN};
+folderpaths = {folderPathP; folderPathN};
+group = [];
+traindata = [];
 normalize = 0;
-for i = 1:size(fileslist,1)
-    if logical(regexp(fileslist(i).name,'.*P.*'))    
-        group(i) = 1;
-    else
-        group(i) = 0;
-    end
-    imdata = imread([folderPath, fileslist(i).name]);
-    clearvars imdata2
-    imdata2 = double(imdata(:));
-    if normalize
-        imdata2 = floor(imdata2./max(imdata2)*255);
-    end
-    traindata(i,:) = imdata2';
+totalfiles = numel(fileslistP) + numel(fileslistN);
+j = 1;
+for k = 1:numel(fileslists)    
+    fileslist = fileslists{k};
+    folderPath = folderpaths{k};
+    for i = 1:size(fileslist,1)
+        if k == 1
+            group(j) = 1;
+        else
+            group(j) = 0;
+        end
+        imdata = imread([folderPath, fileslist(i).name]);
+        clearvars imdata2
+        imdata2 = double(imdata(:));
+        if normalize
+            imdata2 = floor(imdata2./max(imdata2)*255);
+        end
+        traindata(j,:) = imdata2';
+        j = j+ 1;
+    end    
 end
 
 % Train the svm
 svmstruct = svmtrain(traindata, group);
 
-% Classify the trained data
+%% Classify the trained data
 false_pos = 0;
 % false_pos_list = [];
 false_neg = 0;
 % false_neg_list = 0;
 clearvars false_pos_list false_neg_list
 
-for i = 1:size(fileslist,1)
+for i = 1:totalfiles
     res = svmclassify(svmstruct, traindata(i,:));
     % display([fileslist(i).name, ' = ', num2str(res)]);
     if logical(regexp(fileslist(i).name,'.*P.*'))

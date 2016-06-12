@@ -12,14 +12,12 @@ fileslists = {fileslistP; fileslistN};
 folderpaths = {folderPathP; folderPathN};
 group = [];
 traindata = [];
-normalize = 0;
+normalize = 1;
 totalfiles = numel(fileslistP) + numel(fileslistN);
 j = 1;
-
-B = 9;
-cell_x = 6;
-cell_y = 6;
-
+nPixels = 8;
+histN = 255;
+filtR = generateRadialFilterLBP(nPixels,2);
 for k = 1:numel(fileslists)    
     fileslist = fileslists{k};
     folderPath = folderpaths{k};
@@ -30,20 +28,23 @@ for k = 1:numel(fileslists)
             group(j) = 0;
         end
         imdata = imread([folderPath, fileslist(i).name]);
+        
+        LBP = myLBP(imdata);
+        LBP = single(LBP);
+        LBP = hist(LBP(:),histN);
+        % bar(LBP); pause;
         if normalize
-            clearvars imdata2;
-            imdata2 = double(imdata);
-            imdata2 = imdata2./max(imdata2(:)) * 255.0;
-            H = HOG(imdata2, cell_x, cell_y, B);
-        else
-           H = HOG(imdata, cell_x, cell_y, B);
-        end
-        Hconcat = H(:);
-        traindata(j,:) = Hconcat';
+            LBP = LBP / max(LBP(:));            
+        end                
+        traindata(j,:) = LBP;
         j = j+ 1;
     end    
 end
 
+%% Filter traindata
+idxs = mean(traindataB,1);
+idxs = idxs < 0.00051;
+traindata = traindataB(:,idxs);
 %% Train the svm
 svmstruct = svmtrain(traindata, group);
 
@@ -68,8 +69,8 @@ for i = 1:totalfiles
         end
     end
 end
-disp(false_pos);
-disp(false_neg);
+disp('false positives'); disp(false_pos/sum(group == 1));
+disp('false negatives'); disp(false_neg/sum(group==0));
 %% Classify validation data
 % Classify the trained data
 false_pos_val = 0;
