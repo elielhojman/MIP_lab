@@ -1,10 +1,10 @@
 path = 'sacro/dataset/';
 a = dir(path);
-suffix = 'noCanny';
+suffix = 'withCannyFixed';
 files = dir(path);
-badSegWithCanny = {};
-veryBadSegWithCanny = {};
-goodSegWithCanny = {};
+badSegFixed = {};
+veryBadSegFixed= {};
+goodSegFixed = {};
 close all
 for i = 1:numel(files)
     if findstr(a(i).name,suffix) > 0
@@ -16,13 +16,13 @@ for i = 1:numel(files)
         side = a(i).name(end-4);
         segName = strcat(accNum, side);        
         if class == 0
-            goodSegWithCanny{end+1} = segName; 
+            goodSegFixed(end+1) = segName; 
             display(['Good ' segName]);
         elseif class == 1
-            badSegWithCanny{end+1} = segName;
+            badSegFixed(end+1) = segName;
             display(['Bad ' segName]);
         else
-            veryBadSegWithCanny{end+1} = segName;
+            veryBadSegFixed(end+1) = segName;
             display(['Very Bad ' segName]);
         end
     end

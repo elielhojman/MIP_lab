@@ -1,0 +1,12 @@
+function [ output_args ] = saveFileForCNN( imgs, labels, fileImgs, fileLabels )
+%SAVEFILEFORCNN Summary of this function goes here
+%   Detailed explanation goes here
+[rows, cols, totalImgs] = size(imgs);
+X = zeros([ rows cols totalImgs]);
+Y = zeros(2,totalImgs);
+
+for i = 1:size(imgs,3)
+    X(:,:,1,i) = imgs(:,:,i
+
+end
+

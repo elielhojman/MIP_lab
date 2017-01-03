@@ -6,6 +6,10 @@ if nargin < 4
     randomShift = 0;
 end
 
+if numel(randomShift) == 1
+    randomShift(2) = randomShift(1);
+end
+
 if nargin < 2
     imgSzMm = [6 8];
 end
@@ -30,9 +34,9 @@ for i = 1:numel(points)
     end
    
     % To enrich our dataset
-    if randomShift > 0
-        points{i}.x = points{i}.x + randi(randomShift,1,1);
-        points{i}.y = points{i}.y + randi(randomShift,1,1);
+    if randomShift(1) > 0
+        points{i}.x = points{i}.x + randi(randomShift(1),1,1);
+        points{i}.y = points{i}.y + randi(randomShift(2),1,1);
     end
     bone = getRelevantBone(points{i},seg.L + seg.R);    
     xyz = [points{i}.x, points{i}.y, points{i}.z];
